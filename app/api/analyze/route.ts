@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import { GoogleGenerativeAI, Part } from "@google/generative-ai"
 import process from "process"
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "")
@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       return Response.json({ error: "Please provide crop description or image" }, { status: 400 })
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" })
 
     const languageInstructions: Record<string, string> = {
       en: "in English",
@@ -42,10 +42,7 @@ Please provide:
 
 Format the response with clear sections and bullet points for recommendations.`
 
-    const parts: Array<{
-      text?: string
-      inlineData?: { mimeType: string; data: string }
-    }> = [{ text: prompt }]
+    const parts: Part[] = [{ text: prompt }]
 
     if (imageBase64) {
       parts.push({
