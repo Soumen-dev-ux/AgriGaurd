@@ -28,6 +28,7 @@ export default function InputSection({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
   const [isCameraActive, setIsCameraActive] = useState(false)
 
   const { language } = useLanguage()
@@ -101,9 +102,24 @@ export default function InputSection({
             <span className="text-sm font-medium">{t.uploadImage}</span>
           </button>
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
 
           <button
-            onClick={() => (!isCameraActive ? startCamera() : stopCamera())}
+            onClick={() => {
+              const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+              if (isMobile) {
+                cameraInputRef.current?.click()
+              } else {
+                !isCameraActive ? startCamera() : stopCamera()
+              }
+            }}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors"
           >
             <Camera className="w-5 h-5" />
