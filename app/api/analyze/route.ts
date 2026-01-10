@@ -1,16 +1,23 @@
 import { GoogleGenerativeAI, Part } from "@google/generative-ai"
 import process from "process"
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "")
+
 
 export async function POST(request: Request) {
   try {
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) {
+      console.error("GEMINI_API_KEY is not set")
+      return Response.json({ error: "Server configuration error: GEMINI_API_KEY is missing" }, { status: 500 })
+    }
+
     const { description, imageBase64, language } = await request.json()
 
     if (!description && !imageBase64) {
       return Response.json({ error: "Please provide crop description or image" }, { status: 400 })
     }
 
+    const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" })
 
     const languageInstructions: Record<string, string> = {
@@ -45,20 +52,24 @@ Format the response with clear sections and bullet points for recommendations.`
     const parts: Part[] = [{ text: prompt }]
 
     if (imageBase64) {
+      // Extract base64 data correctly (remove header if present)
+      const base64Data = imageBase64.includes(",") ? imageBase64.split(",")[1] : imageBase64
       parts.push({
         inlineData: {
           mimeType: "image/jpeg",
-          data: imageBase64.split(",")[1] || imageBase64,
+          data: base64Data,
         },
       })
     }
 
     const result = await model.generateContent(parts)
-    const diagnosis = result.response.text()
+    const response = await result.response
+    const diagnosis = response.text()
 
     return Response.json({ diagnosis })
   } catch (error) {
-    console.error("Gemini API error:", error)
-    return Response.json({ error: "Failed to analyze crop problem" }, { status: 500 })
+    console.error("Gemini API error details:", error)
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+    return Response.json({ error: `Failed to analyze crop problem: ${errorMessage}` }, { status: 500 })
   }
 }

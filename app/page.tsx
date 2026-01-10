@@ -4,6 +4,7 @@ import { useState } from "react"
 import Header from "@/components/header"
 import InputSection from "@/components/input-section"
 import DiagnosisOutput from "@/components/diagnosis-output"
+import Footer from "@/components/footer"
 import { LanguageProvider } from "@/components/language-provider"
 import { useLanguage } from "@/hooks/use-language"
 import { Loader2 } from "lucide-react"
@@ -57,8 +58,19 @@ function PageContent() {
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to analyze")
+        let errorMessage = "Failed to analyze"
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorMessage
+        } catch {
+          const errorText = await response.text()
+          if (response.status === 413) {
+            errorMessage = "Image is too large. Please use a smaller image."
+          } else {
+            errorMessage = errorText || errorMessage
+          }
+        }
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
@@ -73,9 +85,9 @@ function PageContent() {
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background flex flex-col">
       <Header />
-      <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
+      <div className="flex-1 max-w-4xl mx-auto px-4 py-8 md:py-12 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Input Section */}
           <div className="lg:col-span-2">
@@ -131,6 +143,7 @@ function PageContent() {
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   )
 }

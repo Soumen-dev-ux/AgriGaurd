@@ -34,11 +34,70 @@ export default function InputSection({
   const { language } = useLanguage()
   const t = translations[language]
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImage = async (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = (event) => {
+        const img = new Image()
+        img.src = event.target?.result as string
+        img.onload = () => {
+          const canvas = document.createElement("canvas")
+          let width = img.width
+          let height = img.height
+          const MAX_SIZE = 1200
+
+          if (width > height) {
+            if (width > MAX_SIZE) {
+              height *= MAX_SIZE / width
+              width = MAX_SIZE
+            }
+          } else {
+            if (height > MAX_SIZE) {
+              width *= MAX_SIZE / height
+              height = MAX_SIZE
+            }
+          }
+
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext("2d")
+          ctx?.drawImage(img, 0, 0, width, height)
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const resizedFile = new File([blob], file.name, {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                })
+                resolve(resizedFile)
+              } else {
+                reject(new Error("Canvas to Blob failed"))
+              }
+            },
+            "image/jpeg",
+            0.8
+          )
+        }
+      }
+      reader.onerror = (error) => reject(error)
+    })
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      setUploadedImage(file)
-      setCameraImage(null)
+      try {
+        const compressedFile = await compressImage(file)
+        setUploadedImage(compressedFile)
+        setCameraImage(null)
+      } catch (error) {
+        console.error("Error compressing image:", error)
+        // Fallback to original file if compression fails
+        setUploadedImage(file)
+        setCameraImage(null)
+      }
     }
   }
 
@@ -61,7 +120,7 @@ export default function InputSection({
     if (videoRef.current && canvasRef.current) {
       const context = canvasRef.current.getContext("2d")
       if (context) {
-        context.drawImage(videoRef.current, 0, 0)
+        context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height)
         const imageData = canvasRef.current.toDataURL("image/jpeg")
         setCameraImage(imageData)
         setUploadedImage(null)
