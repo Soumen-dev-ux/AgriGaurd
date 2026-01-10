@@ -87,10 +87,10 @@ function PageContent() {
   return (
     <main className="min-h-screen bg-background flex flex-col">
       <Header />
-      <div className="flex-1 max-w-4xl mx-auto px-4 py-8 md:py-12 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="flex-1 max-w-7xl mx-auto px-4 py-8 md:py-12 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Input Section */}
-          <div className="lg:col-span-2">
+          <div className="space-y-6">
             <InputSection
               cropDescription={cropDescription}
               setCropDescription={setCropDescription}
@@ -100,15 +100,15 @@ function PageContent() {
               setCameraImage={setCameraImage}
             />
 
-            {/* Analyze Button */}
+            {/* Analyze Button - Moved inside this column */}
             <button
               onClick={handleAnalyze}
               disabled={isAnalyzing}
-              className="w-full mt-6 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+              className="w-full px-6 py-4 bg-primary text-primary-foreground rounded-xl font-bold text-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 shadow-lg shadow-primary/20 hover:shadow-primary/30"
             >
               {isAnalyzing ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader2 className="w-6 h-6 animate-spin" />
                   {t.analyzing}
                 </>
               ) : (
@@ -118,26 +118,33 @@ function PageContent() {
 
             {/* Error Display */}
             {error && (
-              <div className="mt-4 p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
-                <p className="text-sm text-destructive">{error}</p>
+              <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-xl animate-in slide-in-from-top-2">
+                <p className="text-sm font-medium text-destructive">{error}</p>
               </div>
             )}
           </div>
 
           {/* Output Section */}
-          <div className="lg:col-span-1">
+          <div className="min-h-[500px]">
             {isAnalyzing ? (
-              <div className="sticky top-8 bg-card border border-border rounded-lg p-6 flex flex-col items-center justify-center min-h-96">
-                <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
-                <p className="text-muted-foreground text-center">{t.analyzing}</p>
+              <div className="sticky top-8 bg-card/50 backdrop-blur-sm border border-border rounded-xl p-8 flex flex-col items-center justify-center h-[500px] shadow-sm">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full animate-pulse" />
+                  <Loader2 className="relative w-16 h-16 text-primary animate-spin" />
+                </div>
+                <p className="mt-6 text-lg font-medium text-muted-foreground animate-pulse">{t.analyzing}</p>
               </div>
             ) : diagnosis ? (
               <div className="sticky top-8">
                 <DiagnosisOutput diagnosis={diagnosis} language={language} />
               </div>
             ) : (
-              <div className="sticky top-8 bg-secondary/10 border border-secondary/20 rounded-lg p-6 text-center">
-                <p className="text-muted-foreground text-sm">{t.resultsMessage}</p>
+              <div className="sticky top-8 bg-secondary/5 border border-dashed border-secondary/30 rounded-xl p-12 text-center h-full flex flex-col items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
+                  <Loader2 className="w-8 h-8 text-muted-foreground/50" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground/80 mb-2">Ready to Analyze</h3>
+                <p className="text-muted-foreground text-sm max-w-xs mx-auto">{t.resultsMessage}</p>
               </div>
             )}
           </div>
