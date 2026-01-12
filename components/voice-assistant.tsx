@@ -241,7 +241,7 @@ export function VoiceAssistant() {
             initial={{ y: 20, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 20, opacity: 0, scale: 0.95 }}
-            className="fixed bottom-6 right-6 z-50 w-full max-w-md shadow-2xl"
+            className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:bottom-6 z-50 md:w-full md:max-w-md shadow-2xl"
           >
             <Card className="border-green-100 dark:border-green-900 border-2 overflow-hidden backdrop-blur-sm bg-white/95 dark:bg-zinc-950/95">
               <CardHeader className="bg-green-50 dark:bg-green-950/30 pb-3 flex flex-row items-center justify-between space-y-0">
@@ -258,7 +258,7 @@ export function VoiceAssistant() {
               </CardHeader>
 
               <CardContent className="p-0">
-                <ScrollArea className="h-[300px] p-4" ref={scrollAreaRef as any}>
+                <ScrollArea className="h-[50vh] md:h-[400px] p-4" ref={scrollAreaRef as any}>
                   <div className="space-y-4">
                     {messages.length === 0 && (
                       <div className="text-center text-muted-foreground py-10">
