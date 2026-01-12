@@ -2,8 +2,8 @@
 
 AgriGuard is an advanced AI-powered application designed to assist farmers and agricultural enthusiasts in diagnosing crop diseases, providing treatment recommendations, and offering general agricultural advice. With a focus on accessibility, it features multilingual support and a voice-activated assistant.
 
-![AgriGuard Demo](./public/og-image.png)
-*(Note: Replace with actual screenshot if available)*
+![AgriGuard Demo](./public/Screenshot%202026-01-13%20000036.png)
+
 
 ## 🚀 Features
 
